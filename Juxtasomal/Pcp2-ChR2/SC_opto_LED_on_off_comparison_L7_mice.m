@@ -1,0 +1,866 @@
+%% SC_opto_response
+% Analyse spike responses to opto flashes, sound stimuli and whisker air
+% puffs
+% by R. Broersen; 01-08-2024
+
+close all;
+clear all;
+OutputVars=[];
+OutputNames = {'Spont_FF_opto','Spont_ISI_mean_opto','Spont_ISI_SD_opto','Spont_CV_opto',...
+    'ROC_opto_facilitation_p','ROC_opto_suppression_p','KDE_baselinefreq_opto',...
+    'Peakamp_max_opto','Peakamp_min_opto','Amp_max_baselineCorrected_opto',...
+    'Amp_min_baselineCorrected_opto','Latency_opto','Area_baselineCorrected_opto',...
+    'Avg_spikefrequency_opto'};
+OutputMeta = struct('counter',{},'cellID',{},'cellPairID',{},'LEDCondition',{},...
+    'fileName_opto',{},'datapath',{});
+PairAnalysis.suppressionAlpha = 0.05;
+PairAnalysis.selectionCondition = 'LED_off';
+PairAnalysis.outputpath = 'path\\AnalysisOutput_LED_on_off_paired';
+for counter = 1:20 % Indicate which cell to analyse for example: (for counter = 1:3) or (for counter = 3)
+    close all;
+    clearvars -except OutputVars OutputNames OutputMeta PairAnalysis counter
+
+    if counter ==1
+        %% 210309_1
+        P.datapath = 'path\\20251017';
+        P.fileName_opto = '25o17026';
+        P.cellID = '251017_7_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==2
+        %% 210309_1
+        P.datapath = 'path\\20251017';
+        P.fileName_opto = '25o17029';
+        P.cellID = '251017_7_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 30; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==3
+        P.datapath = 'path\\20251022';
+        P.fileName_opto = '25o22013';
+        P.cellID = '251022_4_LED_off';
+        P.pksThreshold_opto = 100; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==4
+        %% 210309_1
+        P.datapath = 'path\\20251022';
+        P.fileName_opto = '25o22014';
+        P.cellID = '251022_4_LED_on';
+        P.pksThreshold_opto = 100; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 30; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==5
+        %% 210309_1
+        P.datapath = 'path\\20251022';
+        P.fileName_opto = '25o22018';
+        P.cellID = '251022_5_LED_off';
+        P.pksThreshold_opto = 60; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==6
+        %% 210309_1
+        P.datapath = 'path\\20251022';
+        P.fileName_opto = '25o22019';
+        P.cellID = '251022_5_LED_on';
+        P.pksThreshold_opto = 60; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==7
+        %% 210309_1
+        P.datapath = 'path\\20251104';
+        P.fileName_opto = '25n04002';
+        P.cellID = '251104_1_LED_off';
+        P.pksThreshold_opto = 4; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==8
+        %% 210309_1
+        P.datapath = 'path\\20251104';
+        P.fileName_opto = '25n04004';
+        P.cellID = '251104_1_LED_on';
+        P.pksThreshold_opto = 4; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==9
+        %% 210309_1
+        P.datapath = 'path\\20251104';
+        P.fileName_opto = '25n04017';
+        P.cellID = '251104_5_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==10
+        %% 210309_1
+        P.datapath = 'path\\20251104';
+        P.fileName_opto = '25n04018';
+        P.cellID = '251104_5_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==11
+        %% 210309_1
+        P.datapath = 'path\\20251105';
+        P.fileName_opto = '25n05002';
+        P.cellID = '251105_1_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==12
+        %% 210309_1
+        P.datapath = 'path\\20251105';
+        P.fileName_opto = '25n05003';
+        P.cellID = '251105_1_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==13
+        %% 210309_1
+        P.datapath = 'path\\20251105';
+        P.fileName_opto = '25n05008';
+        P.cellID = '251105_3_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==14
+        %% 210309_1
+        P.datapath = 'path\\20251105';
+        P.fileName_opto = '25n05009';
+        P.cellID = '251105_3_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==15
+        %% 210309_1
+        P.datapath = 'path\\20251105';
+        P.fileName_opto = '25n05013';
+        P.cellID = '251105_4_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==16
+        %% 210309_1
+        P.datapath = 'path\\20251105';
+        P.fileName_opto = '25n05014';
+        P.cellID = '251105_4_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==17
+        %% 210309_1
+        P.datapath = 'path\\20251107';
+        P.fileName_opto = '25n07022';
+        P.cellID = '251107_5_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==18
+        %% 210309_1
+        P.datapath = 'path\\20251107';
+        P.fileName_opto = '25n07023';
+        P.cellID = '251107_5_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==19
+        %% 210309_1
+        P.datapath = 'path\\20251119';
+        P.fileName_opto = '25n19016';
+        P.cellID = '251119_4_LED_off';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+
+    elseif counter ==20
+        %% 210309_1
+        P.datapath = 'path\\20251119';
+        P.fileName_opto = '25n19017';
+        P.cellID = '251119_4_LED_on';
+        P.pksThreshold_opto = 1; % Spike detection threshold in mV
+        P.side = 1; % 1=left hemisphere, 2=right hemisphere
+        P.numReps = 50; % number of trials per file
+        P.numStim_opto_manual=[];% Fill in # trials in case cell dies before the end of the recording. If all trials have spikes, leave empty.
+        P.wavelength = 470; %!! Not important
+        P.spikeDetMode=1; %1=upward going waveform, 2=downward going waveform
+        P.yyaxis_lim = 50; % yyaxis limit for the PSTH plots - no need to change
+        P.peakamp_XwindowLim = 0.5; % Define the outer limit used for calculating the amplitude of reponse; - no need to change
+        P.filtTrace = 1; % Filter the spike trace?
+        P.opto_optoduration = 0.5; % duration of the opto stim in s
+        spkpause=0; % 1 for pausing for checking spikes
+    end
+
+    %% Parameters definition - no need to change
+    P.stimOrder = [2]; %1=no opto, 2=opto
+    P.medianFiltWindow = 0.01; % 2.5 ms window median filter
+    P.filtCutLow = 100; %low cut frequency in Hz
+    % P.filtCutLow = 5; %low cut frequency in Hz
+    P.filtOrder = 1; %Order of the filter
+    P.cutoff  =   500;  % gaussian filter cutoff
+    %P.cutoff  =   3000;  % gaussian filter cutoff
+    P.TTLThreshold = 0.025;
+    cd(P.datapath)
+    P.outputpath = [P.datapath '\AnalysisOutput' ];
+    try
+        cd(P.outputpath)
+    catch
+        mkdir(P.outputpath);
+    end
+    cd(P.datapath)
+
+    % Import the opto data
+    [D.d_opto,D.si_opto,D.h_opto]=abf2load([P.datapath '\' num2str(P.fileName_opto) '.abf'],'channels',{'IN 0'});
+    D.d_opto = squeeze(D.d_opto)';
+    D.fs_opto = 10^6/D.si_opto; % Calculate the sampling frequency in Hz
+    D.recLength_opto = length(D.d_opto)/D.fs_opto; % Recording length in s
+    D.Ts_opto = 1/D.fs_opto; % Sampling point duration in s
+    D.trial_timestamps_opto = [D.Ts_opto:D.Ts_opto:D.recLength_opto]; % Time vector trial
+
+    % Import the TTL pulse (left opto)
+    [D.d_opto_TTL]=abf2load([P.datapath '\' num2str(P.fileName_opto) '.abf'],'channels',{'Opto'});
+    D.d_opto_TTL = squeeze(D.d_opto_TTL)';
+
+    P.numStim_opto = size(D.d_opto_TTL,1);
+
+    %% merge all trials for analysis
+    D.d_opto_full = reshape(D.d_opto',[1,P.numStim_opto*D.fs_opto*D.recLength_opto]);
+    D.d_opto_TTL_full = reshape(D.d_opto_TTL',[1,P.numStim_opto*D.fs_opto*D.recLength_opto]);
+
+    %% Perform  filter on trace (opto)
+    if P.filtTrace==1
+        stdsmooth=sqrt(2*log(2))./(P.cutoff.*2.*pi);
+        %     D.d_opto_full_filt = gfilt(D.d_opto_full',D.fs_opto,stdsmooth)'-median(D.d_opto_full);
+        D.d_opto_full_filt = highpass(D.d_opto_full-median(D.d_opto_full),50,D.fs_opto);
+    elseif P.filtTrace==0
+        D.d_opto_full_filt = D.d_opto_full-median(D.d_opto_full);
+    end
+
+    %% Detect and plot the peaks (opto)
+    idx = [];
+    idx_pks = [];
+    D.pks = {}; D.locs = {};
+    h(1)=figure;
+    idx = D.d_opto_full_filt;
+    if P.spikeDetMode==1
+        idx_pks = idx;
+        idx_pks(idx_pks<P.pksThreshold_opto)=NaN;
+        [D.pks_opto, D.locs_opto] = findpeaks(idx_pks);
+        if numel(D.pks_opto)>0
+            title('opto')
+            hold on; plot(idx), plot(idx_pks,'g'); plot(D.locs_opto,D.pks_opto,'r*');hold off
+            if spkpause==1
+                disp('Paused for Spk check'); pause;
+            end
+        end
+    elseif P.spikeDetMode==2
+        idx_pks=idx*-1;
+        idx_pks(idx_pks<P.pksThreshold_opto)=NaN;
+        [D.pks_opto, D.locs_opto] = findpeaks(idx_pks);
+        if numel(D.pks_opto)>0
+            title('opto')
+            hold on; plot(idx), plot(idx_pks*-1,'g'); plot(D.locs_opto,D.pks_opto*-1,'r*');hold off
+            if spkpause==1
+                disp('Paused for Spk check'); pause;
+            end
+        end
+    end
+
+
+    %% Process TTL trial data all stimuli
+    D.opto_TTL.locs=[];
+    idx = diff(D.d_opto_TTL_full);
+    [~, D.opto_TTL.locs] = find(idx>2);
+    if size(D.opto_TTL.locs,2)~=P.numStim_opto
+        disp('error TTL detection opto')
+        figure; hold on; title('opto'); plot(D.d_opto_TTL_full), plot(D.opto_TTL.locs,0.05,'r*');hold off
+        pause;
+    end
+
+    %% Correct if the number of stimuli is less (manual input)
+    if isempty(P.numStim_opto_manual)==0
+        D.opto_TTL.locs=D.opto_TTL.locs(1:P.numStim_opto_manual);
+        P.numStim_opto = P.numStim_opto_manual;
+    end
+
+    %% Gather the trialdata based on TTL timestamps
+    D.trialID = repmat(P.stimOrder,1,P.numReps);
+    D.trial_timestamps = -0.75+D.Ts_opto:D.Ts_opto:1.25; %750ms baseline - stimulus - 1.25s after
+    D.trialdata_opto={};
+
+    %% Calculate the trial_timestamps in seconds around stimulus start
+    for ii = 1:P.numStim_opto
+        D.trialdata_opto{ii} = (D.locs_opto(D.opto_TTL.locs(ii)-(0.75*D.fs_opto)<=D.locs_opto & D.locs_opto<D.opto_TTL.locs(ii)+(1.25*D.fs_opto))-D.opto_TTL.locs(ii))*D.Ts_opto;
+        D.trialdata_opto{ii} = D.trialdata_opto{ii}';
+    end
+
+    %% Calculate the average spike frequency during the opto stimulus
+    R.avg_spikerate_opto=[];
+    R.avg_duration_opto=0;
+    %opto
+    for ii = 1:P.numStim_opto
+        R.avg_spikerate_opto=[R.avg_spikerate_opto reshape(D.trialdata_opto{ii}((D.trialdata_opto{ii}>=0)&(D.trialdata_opto{ii}<0.5)),1,[])];
+        R.avg_duration_opto=R.avg_duration_opto+0.5;
+    end
+
+    % Calculate the stats
+    R.avg_spikerate_opto_FF=size(R.avg_spikerate_opto,2)/R.avg_duration_opto;
+
+    %% Construct PSTHs
+    count_opto = 0;
+
+    h(4)=figure; hold on;
+    for ii=1:P.numStim_opto
+        count_opto=count_opto+1;
+        plot(D.trialdata_opto{count_opto},repmat(count_opto,numel(D.trialdata_opto{count_opto}),1),'k.');hold on;
+    end
+
+    ylim([0 P.numStim_opto+1]);set(gca,'FontSize',14)
+    ylabel('Trials')
+    xlim([-0.5 1]);set(gca,'FontSize',14)
+    xlabel('Time (s)')
+
+    line([0 0],   [min(get(gca, 'Ylim')) max(get(gca, 'Ylim'))], 'Color', 'b','LineWidth',0.5);
+    line([0.5 0.5],   [min(get(gca, 'Ylim')) max(get(gca, 'Ylim'))], 'Color', 'b','LineWidth',0.5);
+
+
+    %% Calculate KDE
+    [D.opto_kde,D.opto_kde_X]= gauss_kde(D.trialdata_opto,[-0.7499 1.25]);
+
+    %% Plot/adjust subplots
+    title('opto','FontSize',8);
+    %     line([0 0],   [min(get(gca, 'Ylim')) max(get(gca, 'Ylim'))], 'Color', 'g','LineWidth',1);
+    %     line([0.02 0.02],   [min(get(gca, 'Ylim')) max(get(gca, 'Ylim'))], 'Color', 'g','LineWidth',1);
+    yyaxis right
+    P.axes(1) = plot(D.opto_kde_X,D.opto_kde,'r','LineWidth',1.5);
+    ylabel('Spike rate (Hz)')
+
+    %% Calculate the baseline spike frequency for normalization
+    R.kde_baselinefreq_opto = mean(D.opto_kde(D.opto_kde_X>-0.25&D.opto_kde_X<0));
+
+    %% Calculate response characteristics
+
+    %Peakamp stats ON responses during the stimulus (start till 0.5s)
+    R.peakamp_max_opto = max(D.opto_kde(D.opto_kde_X>0.02&D.opto_kde_X<0.5));
+    R.peakamp_min_opto = min(D.opto_kde(D.opto_kde_X>0.02&D.opto_kde_X<0.5));
+
+    % Amplitude (corrected for baseline freq
+    R.amp_max_opto = max(D.opto_kde(D.opto_kde_X>0.02&D.opto_kde_X<0.5))-R.kde_baselinefreq_opto;
+    R.amp_min_opto = min(D.opto_kde(D.opto_kde_X>0.02&D.opto_kde_X<0.5))-R.kde_baselinefreq_opto;
+
+    %First-spike latency for responses - find spike times higher than 0
+    idx=[];
+    for ii = 1:P.numStim_opto
+        try
+            idx(ii)=D.trialdata_opto{ii}(find(D.trialdata_opto{ii}>0,1));
+        catch
+            idx(ii)=NaN;
+        end
+    end
+    idx = idx(idx<0.5);% Remove the spiketimes more than 0.5 sec
+    R.latency_opto = median(idx);
+
+    % Calculate the area
+    R.area_opto=sum(D.opto_kde(D.opto_kde_X>0.02&D.opto_kde_X<0.5)-R.kde_baselinefreq_opto);
+
+
+    %% Spontaneous parameters
+    R.spont.data_opto=[];
+    R.spont.duration_opto=0;
+    R.spont.ISI_list_opto=[];
+
+    %opto
+    for ii = 1:P.numStim_opto
+        R.spont.data_opto=[R.spont.data_opto reshape(D.trialdata_opto{ii}(D.trialdata_opto{ii}<0),1,[])];
+        R.spont.duration_opto=R.spont.duration_opto+0.75;
+        R.spont.ISI_list_opto = [R.spont.ISI_list_opto reshape(diff(D.trialdata_opto{ii}(D.trialdata_opto{ii}<0)),1,[])];
+    end
+
+    % Calculate the stats
+    R.spont.FF_opto = size(R.spont.data_opto,2)/R.spont.duration_opto;
+    R.spont.ISI_opto(1,1) = nanmean(R.spont.ISI_list_opto); % mean of ISIs
+    R.spont.ISI_opto(1,2) = nanstd(R.spont.ISI_list_opto);% SD of ISIs
+    R.spont.CV_opto = (R.spont.ISI_opto(1,1)/R.spont.ISI_opto(1,2));
+
+    %% Perform ROC to detect significant responses
+    R.ROC=[];
+    for ii=1:P.numStim_opto
+        R.ROC.baseline_opto(ii) = sum(-0.5<D.trialdata_opto{ii}&D.trialdata_opto{ii}<=0);
+        R.ROC.stim_opto(ii) = sum(0<D.trialdata_opto{ii}&D.trialdata_opto{ii}<=0.5);% response during stim within the interested window
+    end
+
+    % opto
+    [lightFA,lightHit,lightAUROC] = calcAUROC(R.ROC.baseline_opto, R.ROC.stim_opto);
+
+    figure
+    plot(lightFA,lightHit,'bo-')
+    hold on
+    plot([0,1],[0,1],'k--')
+    set(gca,'xtick',[0 1],'ytick',[0 1],'box','off','tickdir','out')
+    % title (sprintf('ROC for light vs baseline AUROC = %i',lightAUROC))
+    xlabel('False Alarm')
+    ylabel('Hit Rate')
+    axis('square')
+
+    %  I will shuffle the trials
+    nShuffles = 1000;
+    lightAUROCShuffle = zeros(1,nShuffles);
+
+    for s = 1:nShuffles
+        tempshuffle = Shuffle([R.ROC.baseline_opto, R.ROC.stim_opto]);
+        SAcountsShuffle{s} = tempshuffle (1:2:end);
+        lightCountsShuffle{s} = tempshuffle (2:2:end);
+
+        clear lightFAShuffle lightHitShuffle lightAUROCShuffle
+        [lightFAShuffle,lightHitShuffle,lightAUROCShuffle] = calcAUROC(SAcountsShuffle{s},lightCountsShuffle{s});
+        allLightAUROCShuffle(s)  =   lightAUROCShuffle;
+    end
+    % Test the significance
+    diffRealShuffle = allLightAUROCShuffle - lightAUROC; % Get difference between observed and shuffopto ROC
+    R.ROC.opto_facilitation = sum(diffRealShuffle>0)/nShuffles; % Find fraction of shuffopto greater than observed
+    R.ROC.opto_suppression = sum(diffRealShuffle<0)/nShuffles; % Find fraction of shuffopto greater than observed
+    close(gcf);
+
+
+    %% Output figures and data
+    cd(P.outputpath)
+    R.avg_spikerate_opto_deltaFF = R.avg_spikerate_opto_FF - R.spont.FF_opto;
+    if R.spont.FF_opto > 0
+        R.avg_spikerate_opto_normChange = R.avg_spikerate_opto_deltaFF/R.spont.FF_opto;
+    else
+        R.avg_spikerate_opto_normChange = NaN;
+    end
+
+    OutputVars(counter,:) = ([R.spont.FF_opto, R.spont.ISI_opto, R.spont.CV_opto...
+        R.ROC.opto_facilitation, R.ROC.opto_suppression,R.kde_baselinefreq_opto, R.peakamp_max_opto, R.peakamp_min_opto, R.amp_max_opto, R.amp_min_opto, R.latency_opto, R.area_opto, R.avg_spikerate_opto_FF]);
+
+    OutputMeta(counter).counter = counter;
+    OutputMeta(counter).cellID = P.cellID;
+    OutputMeta(counter).cellPairID = regexprep(P.cellID,'_LED_(on|off)$','');
+    if ~isempty(regexpi(P.cellID,'_LED_on$','once'))
+        OutputMeta(counter).LEDCondition = 'LED_on';
+    elseif ~isempty(regexpi(P.cellID,'_LED_off$','once'))
+        OutputMeta(counter).LEDCondition = 'LED_off';
+    else
+        OutputMeta(counter).LEDCondition = 'unknown';
+    end
+    OutputMeta(counter).fileName_opto = P.fileName_opto;
+    OutputMeta(counter).datapath = P.datapath;
+
+    %save overview figure
+    figure(h(4));
+    %
+    % set(gcf,'Position',[200 200 200 200]);
+    % set(gca,'fontname','arial');
+    % fontsize(gcf,8,"points");
+
+    figname = sprintf('SpikeResponses_optoOnly_%s.fig',P.cellID);
+    saveas(gcf,figname,'fig');
+    figname = sprintf('SpikeResponses_optoOnly_%s.pdf',P.cellID);
+    print('-dpdf','-vector','-loose',figname);
+    figname = sprintf('SpikeResponses_optoOnly_%s.jpg',P.cellID);
+    saveas(gcf,figname,'jpg')
+
+    % Save data
+    savename = sprintf('Output_optoOnly_%s.mat',P.cellID);
+    save(savename,'D','P','R','OutputVars','OutputNames','OutputMeta','PairAnalysis');
+    disp('Save completed')
+
+    %% Save individual response figures
+    P.outputpath = [P.datapath '\AnalysisOutput' '\' P.cellID];
+    try
+        cd(P.outputpath)
+    catch
+        mkdir(P.outputpath);
+    end
+    cd(P.outputpath)
+
+    figure(h(1));
+    set(gca,'fontname','arial');
+    % fontsize(gcf,8,"points");
+    % figname = sprintf('SpikeDetection_opto_%s.fig',P.cellID);
+    % saveas(gcf,figname,'fig');
+    figname = sprintf('SpikeDetection_optoOnly_%s.pdf',P.cellID);
+    print('-dpdf','-vector','-fillpage','-loose',figname);
+    figname = sprintf('SpikeDetection_optoOnly_%s.jpg',P.cellID);
+    saveas(gcf,figname,'jpg')
+
+
+end
+
+%% Pair LED off/on recordings from the same cell and test opto-suppression cells
+% Primary response metric: opto_deltaFF = stimulus FF - spontaneous FF.
+% The ratio metric is saved too, but it is not used as the primary test
+% because division by a low spontaneous FF can become unstable.
+if ~exist(PairAnalysis.outputpath,'dir')
+    mkdir(PairAnalysis.outputpath);
+end
+
+idxSpontFF = find(strcmp(OutputNames,'Spont_FF_opto'));
+idxSuppressionP = find(strcmp(OutputNames,'ROC_opto_suppression_p'));
+idxAvgOptoFF = find(strcmp(OutputNames,'Avg_spikefrequency_opto'));
+
+cellPairIDs = {OutputMeta.cellPairID};
+ledConditions = {OutputMeta.LEDCondition};
+uniqueCellPairIDs = unique(cellPairIDs,'stable');
+
+PairResults = struct('cellPairID',{},'counter_LED_off',{},'counter_LED_on',{},...
+    'cellID_LED_off',{},'cellID_LED_on',{},...
+    'avg_spikefrequency_opto_LED_off',{},'avg_spikefrequency_opto_LED_on',{},...
+    'spont_FF_LED_off',{},'spont_FF_LED_on',{},...
+    'opto_deltaFF_LED_off',{},'opto_deltaFF_LED_on',{},...
+    'opto_normChange_LED_off',{},'opto_normChange_LED_on',{},...
+    'suppression_p_LED_off',{},'suppression_p_LED_on',{},'isSuppressionType',{});
+
+pairCounter = 0;
+for ii = 1:numel(uniqueCellPairIDs)
+    idxOff = find(strcmp(cellPairIDs,uniqueCellPairIDs{ii}) & strcmp(ledConditions,'LED_off'),1,'first');
+    idxOn = find(strcmp(cellPairIDs,uniqueCellPairIDs{ii}) & strcmp(ledConditions,'LED_on'),1,'first');
+
+    if isempty(idxOff) || isempty(idxOn)
+        warning('Skipping %s: missing LED_off or LED_on recording.',uniqueCellPairIDs{ii});
+        continue
+    end
+
+    pairCounter = pairCounter + 1;
+    offAvg = OutputVars(idxOff,idxAvgOptoFF);
+    onAvg = OutputVars(idxOn,idxAvgOptoFF);
+    offSpont = OutputVars(idxOff,idxSpontFF);
+    onSpont = OutputVars(idxOn,idxSpontFF);
+    offDelta = offAvg - offSpont;
+    onDelta = onAvg - onSpont;
+
+    if offSpont > 0
+        offNorm = offDelta/offSpont;
+    else
+        offNorm = NaN;
+    end
+
+    if onSpont > 0
+        onNorm = onDelta/onSpont;
+    else
+        onNorm = NaN;
+    end
+
+    PairResults(pairCounter).cellPairID = uniqueCellPairIDs{ii};
+    PairResults(pairCounter).counter_LED_off = OutputMeta(idxOff).counter;
+    PairResults(pairCounter).counter_LED_on = OutputMeta(idxOn).counter;
+    PairResults(pairCounter).cellID_LED_off = OutputMeta(idxOff).cellID;
+    PairResults(pairCounter).cellID_LED_on = OutputMeta(idxOn).cellID;
+    PairResults(pairCounter).avg_spikefrequency_opto_LED_off = offAvg;
+    PairResults(pairCounter).avg_spikefrequency_opto_LED_on = onAvg;
+    PairResults(pairCounter).spont_FF_LED_off = offSpont;
+    PairResults(pairCounter).spont_FF_LED_on = onSpont;
+    PairResults(pairCounter).opto_deltaFF_LED_off = offDelta;
+    PairResults(pairCounter).opto_deltaFF_LED_on = onDelta;
+    PairResults(pairCounter).opto_normChange_LED_off = offNorm;
+    PairResults(pairCounter).opto_normChange_LED_on = onNorm;
+    PairResults(pairCounter).suppression_p_LED_off = OutputVars(idxOff,idxSuppressionP);
+    PairResults(pairCounter).suppression_p_LED_on = OutputVars(idxOn,idxSuppressionP);
+    PairResults(pairCounter).isSuppressionType = PairResults(pairCounter).suppression_p_LED_off < PairAnalysis.suppressionAlpha;
+end
+
+PairStats = struct();
+PairStats.suppressionAlpha = PairAnalysis.suppressionAlpha;
+PairStats.selectionCondition = PairAnalysis.selectionCondition;
+PairStats.nPairsTotal = numel(PairResults);
+
+if isempty(PairResults)
+    isSuppressionType = [];
+else
+    isSuppressionType = [PairResults.isSuppressionType]';
+end
+PairStats.nSuppressionPairs = sum(isSuppressionType);
+
+if any(isSuppressionType)
+    offAvg = [PairResults(isSuppressionType).avg_spikefrequency_opto_LED_off]';
+    onAvg = [PairResults(isSuppressionType).avg_spikefrequency_opto_LED_on]';
+    offDelta = [PairResults(isSuppressionType).opto_deltaFF_LED_off]';
+    onDelta = [PairResults(isSuppressionType).opto_deltaFF_LED_on]';
+    offNorm = [PairResults(isSuppressionType).opto_normChange_LED_off]';
+    onNorm = [PairResults(isSuppressionType).opto_normChange_LED_on]';
+else
+    offAvg = [];
+    onAvg = [];
+    offDelta = [];
+    onDelta = [];
+    offNorm = [];
+    onNorm = [];
+end
+
+PairStats.rawAvgSpikefrequency = localPairedLEDStats('Avg_spikefrequency_opto',offAvg,onAvg);
+PairStats.baselineCorrectedDeltaFF = localPairedLEDStats('Opto_deltaFF_stimMinusSpont',offDelta,onDelta);
+PairStats.relativeNormChange = localPairedLEDStats('Opto_normChange_stimMinusSpont_divSpont',offNorm,onNorm);
+PairStats.metricStats = [PairStats.rawAvgSpikefrequency PairStats.baselineCorrectedDeltaFF PairStats.relativeNormChange];
+
+cd(PairAnalysis.outputpath)
+save('Output_optoOnly_LED_on_off_pairAnalysis.mat','OutputVars','OutputNames','OutputMeta','PairAnalysis','PairResults','PairStats');
+
+try
+    PairResultsTable = struct2table(PairResults);
+    writetable(PairResultsTable,'Output_optoOnly_LED_on_off_pairResults.csv');
+catch ME
+    warning('Could not write pairResults CSV: %s',ME.message);
+end
+
+try
+    PairStatsTable = struct2table(PairStats.metricStats);
+    writetable(PairStatsTable,'Output_optoOnly_LED_on_off_pairStats.csv');
+catch ME
+    warning('Could not write pairStats CSV: %s',ME.message);
+end
+
+if any(isSuppressionType)
+    hPair = figure; hold on;
+    for ii = find(isSuppressionType)'
+        plot([1 2],[PairResults(ii).opto_deltaFF_LED_off PairResults(ii).opto_deltaFF_LED_on],'-o',...
+            'Color',[0.35 0.35 0.35],'MarkerFaceColor',[0.35 0.35 0.35]);
+    end
+    plot([1 2],[nanmean(offDelta) nanmean(onDelta)],'-o','Color',[0.85 0.1 0.1],...
+        'MarkerFaceColor',[0.85 0.1 0.1],'LineWidth',2);
+    set(gca,'XTick',[1 2],'XTickLabel',{'LED off','LED on'},'FontSize',12);
+    xlim([0.75 2.25]);
+    ylabel('Opto response (stim FF - spont FF, Hz)');
+    title(sprintf('Opto-suppression cells, paired LED off/on (n = %d)',PairStats.nSuppressionPairs));
+    box off
+    saveas(hPair,'Paired_optoDeltaFF_suppressionCells.fig','fig');
+    print(hPair,'Paired_optoDeltaFF_suppressionCells.pdf','-dpdf','-vector','-loose');
+    saveas(hPair,'Paired_optoDeltaFF_suppressionCells.jpg','jpg');
+end
+
+disp('LED off/on paired opto analysis completed')
+
+function S = localPairedLEDStats(metricName,offVals,onVals)
+validIdx = ~(isnan(offVals) | isnan(onVals));
+offVals = offVals(validIdx);
+onVals = onVals(validIdx);
+diffVals = onVals - offVals;
+
+S.metric = metricName;
+S.n = numel(diffVals);
+S.mean_LED_off = NaN;
+S.mean_LED_on = NaN;
+S.mean_on_minus_off = NaN;
+S.median_on_minus_off = NaN;
+S.sem_on_minus_off = NaN;
+S.cohen_dz = NaN;
+S.signrank_p = NaN;
+S.signrank_signedrank = NaN;
+S.paired_ttest_p = NaN;
+S.paired_ttest_tstat = NaN;
+S.paired_ttest_df = NaN;
+S.paired_ttest_CI_low = NaN;
+S.paired_ttest_CI_high = NaN;
+S.test_note = '';
+
+if S.n == 0
+    S.test_note = 'No paired suppression cells available for this metric.';
+    return
+end
+
+S.mean_LED_off = mean(offVals);
+S.mean_LED_on = mean(onVals);
+S.mean_on_minus_off = mean(diffVals);
+S.median_on_minus_off = median(diffVals);
+S.sem_on_minus_off = std(diffVals)/sqrt(S.n);
+if std(diffVals) > 0
+    S.cohen_dz = mean(diffVals)/std(diffVals);
+end
+
+if S.n < 2
+    S.test_note = 'Need at least 2 paired cells for paired statistical testing.';
+    return
+end
+
+try
+    [S.signrank_p,~,signrankStats] = signrank(onVals,offVals);
+    if isfield(signrankStats,'signedrank')
+        S.signrank_signedrank = signrankStats.signedrank;
+    end
+catch ME
+    S.test_note = ['signrank failed: ' ME.message];
+end
+
+try
+    [~,S.paired_ttest_p,ttestCI,ttestStats] = ttest(onVals,offVals);
+    S.paired_ttest_tstat = ttestStats.tstat;
+    S.paired_ttest_df = ttestStats.df;
+    S.paired_ttest_CI_low = ttestCI(1);
+    S.paired_ttest_CI_high = ttestCI(2);
+catch ME
+    if isempty(S.test_note)
+        S.test_note = ['ttest failed: ' ME.message];
+    else
+        S.test_note = [S.test_note '; ttest failed: ' ME.message];
+    end
+end
+end
